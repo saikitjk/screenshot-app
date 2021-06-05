@@ -145,10 +145,10 @@
         var sessID = ranGen()
         console.log(sessID)
 
-        // var count = 0
+        
 
-        function doNext(url, count) {
-          //var url = array.shift()//this picks the first one from the array
+        function doNext(count = 0) {
+          var url = array.shift()//this picks the first one from the array
           console.log("jk this is the url " + url)
           console.log("The count: " +count)
           console.log(url)
@@ -228,16 +228,62 @@
         }
 
 
-        //jk change
-         
-        array.forEach((urls, index) =>{
-          doNext(urls, index)//kevin's doNext call;
-          console.log("the index is: " + index)
-          console.log("An URL is used")
-        })
+        //JK change ---[
+        // function doNext(url, count) {
+        //   //var url = array.shift()//this picks the first one from the array
+        //   console.log("jk this is the url " + url)
+        //   console.log("The count: " +count)
+        //   console.log(url)
+        //   if (url) {
+        //     $.post("/api/savescreenshot", { arrLength: arrLength, url: url, sessID: sessID, count: count })
+        //       .then(res => {
+        //         // console.log(res.statusCode)
+        //         // const { result } = res
+        //         // count++
+        //         // console.log(count)
+        //         // const { result } = res
+        //         // console.log("result" + result)
+        //         count++
+        //         // console.log("count: " + count)
+        //         // console.log("arrLength: " + arrLength)
+        //         if (count == arrLength) {
+        //           $("#load-btn").hide()
+        //           $("#save-btn").show()
+        //           $("#download").show()
+        //           alert('your file is ready for download!')
+     
+        //         }
+        //         else {
+        //           doNext(count)
+        //         }
+        //       }).fail(function (xhr, status, error) {
+        //         console.log("error" + error)
+        //         // error handling
+        //         $("#load-btn").hide()
+        //         $("#save-btn").show()
+        //         // alert("Please check the URL(s) you've entered and make sure the requirements are met. \n\n Requirements: \n\n  1. Make sure URL is formatted correct (ex. https://www.google.com/ )\n 2. Only 1 URL per line in textbox")
+        //       });
+        //   }
+        // }
+        //(a)
+        // array.forEach((urls, index) =>{
+        //   doNext(urls, index)//kevin's doNext call;
+        //   console.log("the index is: " + index)
+        //   console.log("An URL is used")
+        //  })
+        //(b)
+        // const tasks = array.map(doNext) // Run all URLs
+        // const results = await Promise.all(tasks) //Gather up the result
+        // results.forEach(x => console.log("URL is used"))
+        //(c)
+        // const tasks = array.map(doNext) // Run all URLs
+        // Promise.all(tasks).then((x)=>{console.log("URL is used")})
 
-        //JK Change
-        //note: the count is the problem
+             //note: 
+
+        //]---JK Change
+     
+        doNext() 
 
       });
     </script>
@@ -251,7 +297,23 @@ https://www.google.com/
 https://www.porsche.com/
 https://www.bmw.com/
 https://www.subaru.com/
-
+https://www.apple.com/
+https://www.amazon.com/
+https://www.facebook.com/
+https://www.wikipedia.org/
+https://www.instagram.com/
+https://www.microsoft.com/
+https://www.stackoverflow.com/
+https://www.yahoo.com/
+https://www.cnn.com/
+https://www.sony.com/
+https://www.bbc.co.uk/
+https://www.github.com/
+https://www.uw.org/
+https://www.hsbc.com/
+https://www.bankofamerica.com/
+https://fontawesome.com/
+https://www.hp.com/
 -->
 
 
