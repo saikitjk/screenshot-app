@@ -8,7 +8,7 @@ var fs = require("fs");
 // Sets up the Express App
 // =============================================================
 var app = express();
-var PORT = 8080;
+var PORT = 5000;
 
 // Sets up the Express app to handle data parsing
 app.use(express.urlencoded({ extended: true }));
@@ -23,65 +23,87 @@ app.get("/", function (req, res) {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// app.post("/api/screenshot", async (req, res) => {
-//   const { url } = req.body;
-
-//   try {
-//     let screenshot = await takeScreenshot(url);
-//     let img = screenshot.toString("base64");
-//     res.send({ result: img });
-//   } catch (e) {
-//     // catch errors and send error status
-//     console.log(e);
-//     res.sendStatus(500);
-//   }
-// });
-
-// async function takeScreenshot(url) {
-//   const browser = await puppeteer.launch({
-//     headless: true,
-//     args: ["--no-sandbox"],
-//   });
-//   const page = await browser.newPage();
-//   await page.goto(url, { waitUntil: "networkidle0" });
-//   // await page.setViewport({
-//   //   width: 1400,
-//   //   height: 1000,
-//   //   deviceScaleFactor: 1,
-//   // });
-//   await page.setViewport({ width: 1200, height: 1200 });
-//   const screenshot = await page.screenshot({ fullPage: true });
-
-//   await browser.close();
-//   return screenshot;
-// }
-
-app.post("/api/savescreenshot", async (req, res) => {
+app.post("/api/screenshot", async (req, res) => {
   const { url } = req.body;
-  const { sessID } = req.body;
-  const { count } = req.body;
-  const { arrLength } = req.body;
 
   try {
-    let screenshot = await saveScreenshot(url, sessID, count);
+    let screenshot = await takeScreenshot(url);
+    let img = screenshot.toString("base64");
+    res.send({ result: img });
+  } catch (e) {
+    // catch errors and send error status
+    console.log(e);
+    res.sendStatus(500);
+  }
+});
+
+async function takeScreenshot(url) {
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ["--no-sandbox"],
+  });
+  const page = await browser.newPage();
+  await page.goto(url, { waitUntil: "networkidle0" });
+  // await page.setViewport({
+  //   width: 1400,
+  //   height: 1000,
+  //   deviceScaleFactor: 1,
+  // });
+  await page.setViewport({ width: 1200, height: 1200 });
+  const screenshot = await page.screenshot({ fullPage: true });
+
+  await browser.close();
+  return screenshot;
+}
+
+app.post("/api/savescreenshot", async (req, res) => {
+  // const { url } = req.body;
+  const { sessID } = req.body;
+  //const { count } = req.body;
+  const { arrLength } = req.body;
+  const { urlArray } = req.body;
+
+  //console.log(urlArray);
+
+  try {
+    //console.log(urlArray);
+    var testCount = 0;
+    // for (var i = 0; i < 5; i++) {
+    //   testCount++; //try to send counter from serverside to front
+    // }
+
+    var count = 0;
+    var promiseArray = [];
+    var screenShotInstance = [];
+    for (var i = 0; i <= urlArray.length; ) {
+      screenShotInstance[i] = await saveScreenshot(urlArray[i], sessID, count);
+      //screenShotInstance[i] = urlArray[i]; <--testing
+      promiseArray.push(screenShotInstance[i]);
+      i++;
+      count++;
+      console.log("i: " + i + " count: " + count);
+    }
+    console.log("gg result: " + promiseArray);
+    //let screenshot = await saveScreenshot(url, sessID, count);
     console.log("count: " + count);
     console.log("arrLength: " + arrLength);
+
+    ///promise.all
+    await Promise.all(promiseArray.map((fn) => fn()));
+    ///
+
     const dir = "./" + sessID;
-    fs.readdir(dir, (err, files) => {
-      if (files.length == arrLength) {
-        zipFile(sessID, function (err) {
-          if (err) {
-            console.log(err); // Check error if you want
-          } else {
-            return;
-          }
-        });
-      }
-    });
-    // if (count+1 == arrLength){
-    //   zipFile(sessID)
-    //   // res.send({ result: sessID })
-    // }
+    // fs.readdir(dir, (err, files) => {
+    //   if (files.length == arrLength) {
+    //     zipFile(sessID, function (err) {
+    //       if (err) {
+    //         console.log(err); // Check error if you want
+    //       } else {
+    //         return;
+    //       }
+    //     });
+    //   }
+    // });
 
     // let img = screenshot.toString('base64')
     res.sendStatus(200);
@@ -126,7 +148,7 @@ async function saveScreenshot(url, sessID, count) {
     args: ["--no-sandbox"],
   });
   const page = await browser.newPage();
-  await page.goto(url, { waitUntil: "networkidle0", timeout: 0 });
+  await page.goto(url, { waitUntil: "networkidle0" });
   // await page.setViewport({
   //   width: 1400,
   //   height: 1000,

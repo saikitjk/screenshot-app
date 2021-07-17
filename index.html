@@ -135,12 +135,13 @@
         $("#load-btn").show()
         $("#save-btn").hide()
         var url = $("#url").val().trim();
-        var array = url.match(/[^\r\n]+/g);
-        console.log(array ) //this lists out the full array 
-        console.log("array length: " + array.length)
+        var urlArray = url.match(/[^\r\n]+/g);
+        console.log(urlArray ) //this lists out the full array 
+      
 
        
-        var arrLength = array.length
+        var arrLength = urlArray.length
+        console.log("array length: " + urlArray.length)
 
         var sessID = ranGen()
         console.log(sessID)
@@ -148,42 +149,28 @@
         
 
         function doNext(count = 0) {
-          var url = array.shift()//this picks the first one from the array
-          console.log("jk this is the url " + url)
+          //var url = urlArray.shift()//this picks the first one from the array
+          var url = true
+          console.log("url: " + url)
           console.log("The count: " +count)
-          console.log(url)
           if (url) {
-            $.post("/api/savescreenshot", { arrLength: arrLength, url: url, sessID: sessID, count: count })
+            // $.post("/api/savescreenshot", { arrLength: arrLength, url: url, sessID: sessID, count: count, urlArray:urlArray })
+            $.post("/api/savescreenshot", { arrLength: arrLength,sessID:sessID, count: count,urlArray:urlArray })
               .then(res => {
-                // console.log(res.statusCode)
-                // const { result } = res
-                // count++
-                // console.log(count)
-                // const { result } = res
-                // console.log("result" + result)
                 count++
-                // console.log("count: " + count)
+                console.log("count: " + count)
                 // console.log("arrLength: " + arrLength)
                 if (count == arrLength) {
                   $("#load-btn").hide()
                   $("#save-btn").show()
                   $("#download").show()
                   alert('your file is ready for download!')
-                  // downloadFile(sessID)
-                  // window.open('/api/savescreenshot')
-                  // var button = document.createElement("input");
-                  // button.type = "button";
-                  // downloadlink = document.createElement('a');
-                  // downloadlink.href = "/" + result + '/screenshots.zip'
-                  // downloadlink.download = true
-                  // downloadlink.appendChild(button)
-                  // var preview = document.getElementById("test");
-                  // preview.appendChild(downloadlink)
                 }
                 else {
                   doNext(count)
                 }
-              }).fail(function (xhr, status, error) {
+              })
+              .fail(function (xhr, status, error) {
                 console.log("error" + error)
                 // error handling
                 $("#load-btn").hide()
@@ -228,60 +215,6 @@
         }
 
 
-        //JK change ---[
-        // function doNext(url, count) {
-        //   //var url = array.shift()//this picks the first one from the array
-        //   console.log("jk this is the url " + url)
-        //   console.log("The count: " +count)
-        //   console.log(url)
-        //   if (url) {
-        //     $.post("/api/savescreenshot", { arrLength: arrLength, url: url, sessID: sessID, count: count })
-        //       .then(res => {
-        //         // console.log(res.statusCode)
-        //         // const { result } = res
-        //         // count++
-        //         // console.log(count)
-        //         // const { result } = res
-        //         // console.log("result" + result)
-        //         count++
-        //         // console.log("count: " + count)
-        //         // console.log("arrLength: " + arrLength)
-        //         if (count == arrLength) {
-        //           $("#load-btn").hide()
-        //           $("#save-btn").show()
-        //           $("#download").show()
-        //           alert('your file is ready for download!')
-     
-        //         }
-        //         else {
-        //           doNext(count)
-        //         }
-        //       }).fail(function (xhr, status, error) {
-        //         console.log("error" + error)
-        //         // error handling
-        //         $("#load-btn").hide()
-        //         $("#save-btn").show()
-        //         // alert("Please check the URL(s) you've entered and make sure the requirements are met. \n\n Requirements: \n\n  1. Make sure URL is formatted correct (ex. https://www.google.com/ )\n 2. Only 1 URL per line in textbox")
-        //       });
-        //   }
-        // }
-        //(a)
-        // array.forEach((urls, index) =>{
-        //   doNext(urls, index)//kevin's doNext call;
-        //   console.log("the index is: " + index)
-        //   console.log("An URL is used")
-        //  })
-        //(b)
-        // const tasks = array.map(doNext) // Run all URLs
-        // const results = await Promise.all(tasks) //Gather up the result
-        // results.forEach(x => console.log("URL is used"))
-        //(c)
-        // const tasks = array.map(doNext) // Run all URLs
-        // Promise.all(tasks).then((x)=>{console.log("URL is used")})
-
-             //note: 
-
-        //]---JK Change
      
         doNext() 
 
@@ -341,103 +274,3 @@ https://www.northwestmini.com/
 
 
 
-<!--This is duplicated? originally from line 130, placed after the ranGen function-->
-<!-- $("#ss-btn").on("click", function (event) {
-  console.log("is this used?1")
-  event.preventDefault();
-  $("#load-btn").show()
-  $("#ss-btn").hide()
-  var url = $("#url").val().trim();
-  var array = url.match(/[^\r\n]+/g);
-  console.log(array)
-  console.log("array length: " + array.length)
-  var arrLength = array.length
-  // var count = 0
-
-  function doNext(count = 0) {
-    var url = array.shift()
-
-    if (url) {
-      console.log("is this used?2")
-      $.post("/api/screenshot", { url: url })
-        .then(res => {
-          // console.log(res.statusCode)
-          const { result } = res
-          // count++
-          // console.log(count)
-          console.log(res)
-          // console.log(array)
-          var div = document.createElement("div");
-          var img = document.createElement("img");
-          img.src = "data:image/png;base64," + result;
-          img.style.width = "100%";
-          img.setAttribute("id", "screenshot");
-          var br = document.createElement("br")
-          var br2 = document.createElement("br")
-          var br3 = document.createElement("br")
-          var link = document.createElement("h3")
-          link.innerText = "URL: " + url
-          // link.innerText = count+1 + ". " + url
-          var hr = document.createElement("hr")
-          var preview = document.getElementById("test");
-          div.appendChild(link)
-          div.appendChild(br)
-          div.appendChild(img)
-          div.appendChild(br2)
-          div.appendChild(br3)
-          div.appendChild(hr)
-          preview.appendChild(div)
-
-
-          // count++
-          // if (count == array.length) {
-          //   $("#load-btn").hide()
-          //   $("#ss-btn").show()
-          // }
-          // console.log("count: "+ count)
-        }).fail(function (xhr, status, error) {
-          // error handling
-          $("#load-btn").hide()
-          $("#ss-btn").show()
-          alert("Please check the URL(s) you've entered and make sure the requirements are met. \n\n Requirements: \n\n  1. Make sure URL is formatted correct (ex. https://www.google.com/ )\n 2. Only 1 URL per line in textbox")
-        });
-
-
-      $("#test").on('DOMNodeInserted', function () {
-        // console.log(url)
-        // console.log(array)
-        count++
-        console.log(count)
-        doNext(count)
-
-        if (count == arrLength) {
-          $("#load-btn").hide()
-          $("#ss-btn").show()
-        }
-      });
-    }
-  }
-
-  doNext()
-
-  // for (i = 0; i < array.length; i++) {
-  //   var count = 0
-  //   $.post("/api/screenshot", { url: array[i] })
-  //     .done(res => {
-  //       const { result } = res
-  //       count++
-  //       console.log(count)
-  //       console.log(res)
-  //       var img = document.createElement("img");
-  //       img.src = "data:image/png;base64," + result;
-  //       img.height = "500";
-  //       var preview = document.getElementById("test");
-  //       preview.appendChild(img);
-  //       if (count == array.length) {
-  //         $("#load-btn").hide()
-  //         $("#ss-btn").show()
-  //       }
-  //     })
-  // }
-
-}); -->
