@@ -4,6 +4,7 @@ var express = require("express");
 var path = require("path");
 var puppeteer = require("puppeteer");
 var fs = require("fs");
+var Promise = require("bluebird");
 
 // Sets up the Express App
 // =============================================================
@@ -66,6 +67,9 @@ app.post("/api/savescreenshot", async (req, res) => {
   //console.log(urlArray);
 
   try {
+    console.log("SessID: " + sessID);
+    console.log("The amount of URLs: " + urlArray.length);
+    console.log("URLs to be processed: " + urlArray);
     //console.log(urlArray);
     var testCount = 0;
     // for (var i = 0; i < 5; i++) {
@@ -75,21 +79,29 @@ app.post("/api/savescreenshot", async (req, res) => {
     var count = 0;
     var promiseArray = [];
     var screenShotInstance = [];
-    for (var i = 0; i <= urlArray.length; ) {
-      screenShotInstance[i] = await saveScreenshot(urlArray[i], sessID, count);
-      //screenShotInstance[i] = urlArray[i]; <--testing
-      promiseArray.push(screenShotInstance[i]);
-      i++;
-      count++;
-      console.log("i: " + i + " count: " + count);
-    }
-    console.log("gg result: " + promiseArray);
+
+    // for (var i = 0; i <= urlArray.length; ) {
+    //   console.log("current url that being processed: " + urlArray[i]);
+    //   screenShotInstance[i] = saveScreenshot(urlArray[i], sessID, count);
+    //   //screenShotInstance[i] = urlArray[i]; <--testing
+    //   promiseArray.push(screenShotInstance[i]);
+
+    //   i++;
+    //   count++;
+    //   console.log("i: " + i + " count: " + count);
+    //   console.log("ScreenShotInstance: " + screenShotInstance);
+    //   console.log("gg result: " + JSON.stringify(promiseArray));
+    // }
+
     //let screenshot = await saveScreenshot(url, sessID, count);
-    console.log("count: " + count);
-    console.log("arrLength: " + arrLength);
 
     ///promise.all
-    await Promise.all(promiseArray.map((fn) => fn()));
+    //await Promise.all(promiseArray.map(item => await saveScreenshot(urlArray[i], sessID, count)));
+    await Promise.all(
+      urlArray.map((url, index) => {
+        screenShotFunction(url, sessID, index);
+      })
+    );
     ///
 
     const dir = "./" + sessID;
@@ -133,9 +145,8 @@ app.get("/api/download", function (req, res) {
   // });
 });
 
-async function saveScreenshot(url, sessID, count) {
-  console.log(sessID);
-  if (count == 0) {
+const screenShotFunction = async function saveScreenshot(url, sessID, index) {
+  if (index == 0) {
     fs.mkdir(path.join(__dirname, sessID), (err) => {
       if (err) {
         return console.error(err);
@@ -148,7 +159,7 @@ async function saveScreenshot(url, sessID, count) {
     args: ["--no-sandbox"],
   });
   const page = await browser.newPage();
-  await page.goto(url, { waitUntil: "networkidle0" });
+  await page.goto(url, { waitUntil: "networkidle0", timeout: 0 });
   // await page.setViewport({
   //   width: 1400,
   //   height: 1000,
@@ -157,14 +168,16 @@ async function saveScreenshot(url, sessID, count) {
   // await page.setViewport({ width: 1200, height: 1200 });
   await page.screenshot({
     fullPage: true,
-    path: sessID + "/" + count + ".png",
+    path: sessID + "/" + index + ".png",
   });
   // const screenshot = await page.screenshot({ path: folder + '/' + count + '.png', fullPage: true })
 
-  await browser.close();
+  await browser.close(
+    console.log("(" + index + ")" + "URL: " + url + " completed")
+  );
   // count++
   // return count
-}
+};
 
 function zipFile(sessID) {
   let zip = require("node-zip")();
