@@ -79,7 +79,7 @@ app.post("/api/savescreenshot", async (req, res) => {
     var count = 0;
     var promiseArray = [];
     var screenShotInstance = [];
-
+    let kickStart1 = await createDir(count, sessID);
     // for (var i = 0; i <= urlArray.length; ) {
     //   console.log("current url that being processed: " + urlArray[i]);
     //   screenShotInstance[i] = saveScreenshot(urlArray[i], sessID, count);
@@ -97,14 +97,15 @@ app.post("/api/savescreenshot", async (req, res) => {
 
     ///promise.all
     //await Promise.all(promiseArray.map(item => await saveScreenshot(urlArray[i], sessID, count)));
-    await Promise.all(
-      urlArray.map((url, index) => {
-        screenShotFunction(url, sessID, index);
-      })
+    let kickStart2 = await Promise.all(
+      urlArray.map(
+        (url, index) => {
+          screenShotFunction(url, sessID, index);
+        },
+        { concurrency: 2 }
+      )
     );
-    ///
-
-    const dir = "./" + sessID;
+    //const dir = "./" + sessID;
     // fs.readdir(dir, (err, files) => {
     //   if (files.length == arrLength) {
     //     zipFile(sessID, function (err) {
@@ -116,6 +117,12 @@ app.post("/api/savescreenshot", async (req, res) => {
     //     });
     //   }
     // });
+
+    ///
+    // const list = [kickStart1, kickStart2];
+    // for (const fn of list) {
+    //   await fn();
+    // }
 
     // let img = screenshot.toString('base64')
     res.sendStatus(200);
@@ -145,8 +152,8 @@ app.get("/api/download", function (req, res) {
   // });
 });
 
-const screenShotFunction = async function saveScreenshot(url, sessID, index) {
-  if (index == 0) {
+async function createDir(count, sessID) {
+  if (count == 0) {
     fs.mkdir(path.join(__dirname, sessID), (err) => {
       if (err) {
         return console.error(err);
@@ -154,6 +161,17 @@ const screenShotFunction = async function saveScreenshot(url, sessID, index) {
       console.log("Directory created successfully!");
     });
   }
+}
+
+const screenShotFunction = async function saveScreenshot(url, sessID, index) {
+  // if (count == 0) {
+  //   fs.mkdir(path.join(__dirname, sessID), (err) => {
+  //     if (err) {
+  //       return console.error(err);
+  //     }
+  //     console.log("Directory created successfully!");
+  //   });
+  // }
   const browser = await puppeteer.launch({
     headless: true,
     args: ["--no-sandbox"],
@@ -175,7 +193,6 @@ const screenShotFunction = async function saveScreenshot(url, sessID, index) {
   await browser.close(
     console.log("(" + index + ")" + "URL: " + url + " completed")
   );
-  // count++
   // return count
 };
 
