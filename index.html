@@ -150,10 +150,10 @@
 
         function doNext(count = 0) {
           //var url = urlArray.shift()//this picks the first one from the array
-          var url = true
+          // var url = true
           console.log("url: " + url)
           console.log("The count: " +count)
-          if (url) {
+          if (urlArray) {
             // $.post("/api/savescreenshot", { arrLength: arrLength, url: url, sessID: sessID, count: count, urlArray:urlArray })
             $.post("/api/savescreenshot", { arrLength: arrLength,sessID:sessID, count: count,urlArray:urlArray })
               .then(res => {

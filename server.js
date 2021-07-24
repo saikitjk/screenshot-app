@@ -60,26 +60,36 @@ async function takeScreenshot(url) {
 app.post("/api/savescreenshot", async (req, res) => {
   // const { url } = req.body;
   const { sessID } = req.body;
-  //const { count } = req.body;
+  const { count } = req.body;
   const { arrLength } = req.body;
   const { urlArray } = req.body;
 
   //console.log(urlArray);
+  console.log("SessID: " + sessID);
+  console.log("The amount of URLs: " + urlArray.length);
+  console.log("URLs to be processed: " + urlArray);
+
+  if (count == 0) {
+    fs.mkdir(path.join(__dirname, sessID), (err) => {
+      if (err) {
+        return console.error("mkdir error: " + err);
+      }
+      console.log("Directory created successfully!");
+    });
+  }
 
   try {
-    console.log("SessID: " + sessID);
-    console.log("The amount of URLs: " + urlArray.length);
-    console.log("URLs to be processed: " + urlArray);
     //console.log(urlArray);
     var testCount = 0;
     // for (var i = 0; i < 5; i++) {
     //   testCount++; //try to send counter from serverside to front
     // }
 
-    var count = 0;
+    //var count = 0;
     var promiseArray = [];
+    var sequentialArray = [];
     var screenShotInstance = [];
-    let kickStart1 = await createDir(count, sessID);
+    // let kickStart1 = await createDir(count, sessID);
     // for (var i = 0; i <= urlArray.length; ) {
     //   console.log("current url that being processed: " + urlArray[i]);
     //   screenShotInstance[i] = saveScreenshot(urlArray[i], sessID, count);
@@ -102,7 +112,7 @@ app.post("/api/savescreenshot", async (req, res) => {
         (url, index) => {
           screenShotFunction(url, sessID, index);
         },
-        { concurrency: 2 }
+        { concurrency: 5 }
       )
     );
     //const dir = "./" + sessID;
@@ -152,16 +162,16 @@ app.get("/api/download", function (req, res) {
   // });
 });
 
-async function createDir(count, sessID) {
-  if (count == 0) {
-    fs.mkdir(path.join(__dirname, sessID), (err) => {
-      if (err) {
-        return console.error(err);
-      }
-      console.log("Directory created successfully!");
-    });
-  }
-}
+// async function createDir(count, sessID) {
+//   if (count == 0) {
+//     fs.mkdir(path.join(__dirname, sessID), (err) => {
+//       if (err) {
+//         return console.error(err);
+//       }
+//       console.log("Directory created successfully!");
+//     });
+//   }
+// }
 
 const screenShotFunction = async function saveScreenshot(url, sessID, index) {
   // if (count == 0) {
