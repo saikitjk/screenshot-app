@@ -107,10 +107,11 @@ app.post("/api/savescreenshot", async (req, res) => {
 
     ///promise.all
     //await Promise.all(promiseArray.map(item => await saveScreenshot(urlArray[i], sessID, count)));
-    let kickStart2 = await Promise.all(
+    // let kickStart2 =
+    await Promise.all(
       urlArray.map(
         (url, index) => {
-          screenShotFunction(url, sessID, index);
+          saveScreenshot(url, sessID, index);
         },
         { concurrency: 5 }
       )
@@ -173,7 +174,7 @@ app.get("/api/download", function (req, res) {
 //   }
 // }
 
-const screenShotFunction = async function saveScreenshot(url, sessID, index) {
+async function saveScreenshot(url, sessID, index) {
   // if (count == 0) {
   //   fs.mkdir(path.join(__dirname, sessID), (err) => {
   //     if (err) {
@@ -204,7 +205,7 @@ const screenShotFunction = async function saveScreenshot(url, sessID, index) {
     console.log("(" + index + ")" + "URL: " + url + " completed")
   );
   // return count
-};
+}
 
 function zipFile(sessID) {
   let zip = require("node-zip")();

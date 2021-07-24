@@ -134,9 +134,28 @@
         event.preventDefault();
         $("#load-btn").show()
         $("#save-btn").hide()
-        var url = $("#url").val().trim();
-        var urlArray = url.match(/[^\r\n]+/g);
-        console.log(urlArray ) //this lists out the full array 
+        // var url = $("#url").val().trim();//Disabled for now
+        // var urlArray = url.match(/[^\r\n]+/g); /Disabled for now
+        ////////testing///////////
+        var urlArray = [
+    "https://www.google.com/",
+    "https://www.porsche.com/",
+    "https://www.bmw.com/",
+    "https://www.subaru.com/",
+    "https://www.bmwseattle.com/",
+    "https://www.bmwbellevue.com/",
+    "https://www.mercedesbenzofbellevue.com/",
+    "https://www.porschebellingham.com/",
+    "https://www.porschebellevue.com/",
+    "https://www.rentonsubaru.com/",
+    "https://www.michaelssubaru.com/",
+    "https://www.subaruofpuyallup.com/",
+    "https://www.porschebeaverton.com/",
+    "https://www.bmwnorthwest.com/",
+    "https://www.northwestmini.com/",
+];
+        ////////testing//////////
+        console.log(urlArray )  
       
 
        
@@ -157,7 +176,7 @@
             // $.post("/api/savescreenshot", { arrLength: arrLength, url: url, sessID: sessID, count: count, urlArray:urlArray })
             $.post("/api/savescreenshot", { arrLength: arrLength,sessID:sessID, count: count,urlArray:urlArray })
               .then(res => {
-                count++
+                // count++ //disable for now
                 console.log("count: " + count)
                 // console.log("arrLength: " + arrLength)
                 if (count == arrLength) {
