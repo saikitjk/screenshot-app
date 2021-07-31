@@ -82,11 +82,16 @@ app.post("/api/savescreenshot", async (req, res) => {
   try {
     async () => {
       const cluster = await Cluster.launch({
-        concurrency: Cluster.CONCURRENCY_CONTEXT,
+        concurrency: Cluster.CONCURRENCY_CONTEXT, //use Cluster.CONCURRENCY_BROWSER to prevent hang
         maxConcurrency: urlArray.length,
+        //workerCreationDelay: 200  //to prevent max cpu at the start
         monitor: true,
         headless: true,
         timeout: 300000,
+      });
+      //error to console
+      cluster.on("taskerror ", (err, data) => {
+        console.log(`Error capturing ${data}: ${err.message}`);
       });
     };
     //const dir = "./" + sessID;
