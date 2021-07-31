@@ -93,6 +93,30 @@ app.post("/api/savescreenshot", async (req, res) => {
       cluster.on("taskerror ", (err, data) => {
         console.log(`Error capturing ${data}: ${err.message}`);
       });
+
+      await cluster.task(async ({ page, data: url, worker }) => {
+        // const page = await browser.newPage();
+        console.log(sessID);
+        console.log("Processing: " + worker.id + url);
+
+        await page.goto(url, { waitUntil: "networkidle0", timeout: 0 });
+        // const path = url.replace(/[^a-zA-Z]/g, "_") + ".png";
+        //await page.setViewport({ width: 1024, height: 768 });
+        let frames = await page.frames();
+
+        ///this saves at root dir
+        // await page.screenshot({
+        //   fullPage: true,
+        //   path: `screenshot${worker.id}.png`,
+        // });
+
+        await page.screenshot({
+          fullPage: true,
+          path: `${sessID}/screenshot${worker.id}.png`,
+        });
+
+        console.log(`Screenshot of ${url} saved`);
+      });
     };
     //const dir = "./" + sessID;
     // fs.readdir(dir, (err, files) => {
