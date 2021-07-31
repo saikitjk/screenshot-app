@@ -2,7 +2,7 @@
 // =============================================================
 const express = require("express");
 const path = require("path");
-const puppeteer = require("puppeteer");
+//const puppeteer = require("puppeteer");
 const { Cluster } = require("puppeteer-cluster");
 const fs = require("fs");
 // var Promise = require("bluebird");
@@ -25,78 +25,55 @@ app.get("/", function (req, res) {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-app.post("/api/screenshot", async (req, res) => {
-  const { url } = req.body;
-
-  try {
-    let screenshot = await takeScreenshot(url);
-    let img = screenshot.toString("base64");
-    res.send({ result: img });
-  } catch (e) {
-    // catch errors and send error status
-    console.log(e);
-    res.sendStatus(500);
-  }
-});
-
-async function takeScreenshot(url) {
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ["--no-sandbox"],
-  });
-  const page = await browser.newPage();
-  await page.goto(url, { waitUntil: "networkidle0" });
-  // await page.setViewport({
-  //   width: 1400,
-  //   height: 1000,
-  //   deviceScaleFactor: 1,
-  // });
-  await page.setViewport({ width: 1200, height: 1200 });
-  const screenshot = await page.screenshot({ fullPage: true });
-
-  await browser.close();
-  return screenshot;
-}
-
 app.post("/api/savescreenshot", async (req, res) => {
   // const { url } = req.body;
   const { sessID } = req.body;
   const { count } = req.body;
   //const { arrLength } = req.body;
-  const { urlArray } = req.body;
+  var urlArray = req.body;
 
   //console.log(urlArray);
-  console.log("SessID: " + sessID);
-  console.log("The amount of URLs: " + urlArray.length);
-  console.log("URLs to be processed: " + urlArray);
+  // console.log("SessID: " + sessID);
+  // console.log("The amount of URLs: " + urlArray.length);
 
-  if (count == 0) {
-    fs.mkdir(path.join(__dirname, sessID), (err) => {
-      if (err) {
-        return console.error("mkdir error: " + err);
-      }
-      console.log("Directory created successfully!");
-    });
-  }
+  // if (count == 0) {
+  //   fs.mkdir(path.join(__dirname, sessID), (err) => {
+  //     if (err) {
+  //       return console.error("mkdir error: " + err);
+  //     }
+  //     console.log("Directory created successfully!");
+  //   });
+  // }
 
   try {
+    // ///url for test
+    // var urlArray = [
+    //   "https://www.google.com/",
+    //   "https://www.porsche.com/",
+    //   "https://www.bmw.com/",
+    // ];
+
     (async () => {
+      //Create cluster with 10 workers
       const cluster = await Cluster.launch({
-        concurrency: Cluster.CONCURRENCY_CONTEXT, //use Cluster.CONCURRENCY_BROWSER to prevent hang
+        //concurrency: Cluster.CONCURRENCY_CONTEXT,
+        concurrency: Cluster.CONCURRENCY_BROWSER, //to prevent hang,
         maxConcurrency: urlArray.length,
-        //workerCreationDelay: 200  //to prevent max cpu at the start
+        workerCreationDelay: 200, //to prevent max cpu at the start
         monitor: true,
         headless: true,
         timeout: 300000,
       });
-      //error to console
-      cluster.on("taskerror ", (err, data) => {
-        console.log(`Error capturing ${data}: ${err.message}`);
+
+      // Print errors to console
+      cluster.on("taskerror", (err, data) => {
+        console.log(`Error crawling ${data}: ${err.message}`);
       });
 
       await cluster.task(async ({ page, data: url, worker }) => {
+        // const browser = await puppeteer.launch({ headless: false, slowMo: 50 });
         // const page = await browser.newPage();
-        console.log(sessID);
+        console.log("sessID: " + sessID);
         console.log("Processing: " + worker.id + url);
 
         await page.goto(url, { waitUntil: "networkidle0", timeout: 0 });
@@ -104,7 +81,7 @@ app.post("/api/savescreenshot", async (req, res) => {
         //await page.setViewport({ width: 1024, height: 768 });
         //let frames = await page.frames();
 
-        ///this saves at root dir
+        ///this saves at root
         // await page.screenshot({
         //   fullPage: true,
         //   path: `screenshot${worker.id}.png`,
@@ -131,7 +108,8 @@ app.post("/api/savescreenshot", async (req, res) => {
       }
       await cluster.idle();
       await cluster.close();
-      console.log("All URLs captured");
+      console.log("Completed, check the screenshots");
+      res.sendStatus(200);
     })();
     //const dir = "./" + sessID;
     // fs.readdir(dir, (err, files) => {
@@ -145,8 +123,6 @@ app.post("/api/savescreenshot", async (req, res) => {
     //     });
     //   }
     // });
-
-    res.sendStatus(200);
   } catch (e) {
     // catch errors and send error status
     console.log(e);
@@ -173,10 +149,8 @@ app.get("/api/download", function (req, res) {
   // });
 });
 
-//*****************Functions area**********************/
-//Screenshot function
+//*****************Zip file functions**********************/
 
-//Zip file function
 function zipFile(sessID) {
   let zip = require("node-zip")();
 
@@ -211,7 +185,7 @@ function zipFile(sessID) {
     // do something with the new zipped file
   });
 }
-//*****************Functions area**********************/
+//*****************Zip file functions area**********************/
 // Starts the server to begin listening
 // =============================================================
 app.listen(PORT, function () {
