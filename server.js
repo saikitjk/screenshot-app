@@ -62,7 +62,7 @@ app.post("/api/savescreenshot", async (req, res) => {
   // const { url } = req.body;
   const { sessID } = req.body;
   const { count } = req.body;
-  const { arrLength } = req.body;
+  //const { arrLength } = req.body;
   const { urlArray } = req.body;
 
   //console.log(urlArray);
@@ -80,7 +80,7 @@ app.post("/api/savescreenshot", async (req, res) => {
   }
 
   try {
-    async () => {
+    (async () => {
       const cluster = await Cluster.launch({
         concurrency: Cluster.CONCURRENCY_CONTEXT, //use Cluster.CONCURRENCY_BROWSER to prevent hang
         maxConcurrency: urlArray.length,
@@ -102,7 +102,7 @@ app.post("/api/savescreenshot", async (req, res) => {
         await page.goto(url, { waitUntil: "networkidle0", timeout: 0 });
         // const path = url.replace(/[^a-zA-Z]/g, "_") + ".png";
         //await page.setViewport({ width: 1024, height: 768 });
-        let frames = await page.frames();
+        //let frames = await page.frames();
 
         ///this saves at root dir
         // await page.screenshot({
@@ -117,10 +117,25 @@ app.post("/api/savescreenshot", async (req, res) => {
 
         console.log(`Screenshot of ${url} saved`);
       });
-    };
+
+      for (let i = 0; i < urlArray.length; i++) {
+        if (i == 0) {
+          fs.mkdir(path.join(__dirname, sessID), (err) => {
+            if (err) {
+              return console.error("mkdir error: " + err);
+            }
+            console.log("Directory created successfully!");
+          });
+        }
+        cluster.queue(urlArray[i]);
+      }
+      await cluster.idle();
+      await cluster.close();
+      console.log("All URLs captured");
+    })();
     //const dir = "./" + sessID;
     // fs.readdir(dir, (err, files) => {
-    //   if (files.length == arrLength) {
+    //   if (files.length == urlArray.length) {
     //     zipFile(sessID, function (err) {
     //       if (err) {
     //         console.log(err); // Check error if you want
