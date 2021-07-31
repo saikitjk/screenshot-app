@@ -1,10 +1,11 @@
 // Dependencies
 // =============================================================
-var express = require("express");
-var path = require("path");
-var puppeteer = require("puppeteer");
-var fs = require("fs");
-var Promise = require("bluebird");
+const express = require("express");
+const path = require("path");
+const puppeteer = require("puppeteer");
+const { Cluster } = require("puppeteer-cluster");
+const fs = require("fs");
+// var Promise = require("bluebird");
 
 // Sets up the Express App
 // =============================================================
@@ -79,43 +80,15 @@ app.post("/api/savescreenshot", async (req, res) => {
   }
 
   try {
-    //console.log(urlArray);
-    var testCount = 0;
-    // for (var i = 0; i < 5; i++) {
-    //   testCount++; //try to send counter from serverside to front
-    // }
-
-    //var count = 0;
-    var promiseArray = [];
-    var sequentialArray = [];
-    var screenShotInstance = [];
-    // let kickStart1 = await createDir(count, sessID);
-    // for (var i = 0; i <= urlArray.length; ) {
-    //   console.log("current url that being processed: " + urlArray[i]);
-    //   screenShotInstance[i] = saveScreenshot(urlArray[i], sessID, count);
-    //   //screenShotInstance[i] = urlArray[i]; <--testing
-    //   promiseArray.push(screenShotInstance[i]);
-
-    //   i++;
-    //   count++;
-    //   console.log("i: " + i + " count: " + count);
-    //   console.log("ScreenShotInstance: " + screenShotInstance);
-    //   console.log("gg result: " + JSON.stringify(promiseArray));
-    // }
-
-    //let screenshot = await saveScreenshot(url, sessID, count);
-
-    ///promise.all
-    //await Promise.all(promiseArray.map(item => await saveScreenshot(urlArray[i], sessID, count)));
-    // let kickStart2 =
-    await Promise.all(
-      urlArray.map(
-        (url, index) => {
-          saveScreenshot(url, sessID, index);
-        },
-        { concurrency: 5 }
-      )
-    );
+    async () => {
+      const cluster = await Cluster.launch({
+        concurrency: Cluster.CONCURRENCY_CONTEXT,
+        maxConcurrency: urlArray.length,
+        monitor: true,
+        headless: true,
+        timeout: 300000,
+      });
+    };
     //const dir = "./" + sessID;
     // fs.readdir(dir, (err, files) => {
     //   if (files.length == arrLength) {
@@ -129,13 +102,6 @@ app.post("/api/savescreenshot", async (req, res) => {
     //   }
     // });
 
-    ///
-    // const list = [kickStart1, kickStart2];
-    // for (const fn of list) {
-    //   await fn();
-    // }
-
-    // let img = screenshot.toString('base64')
     res.sendStatus(200);
   } catch (e) {
     // catch errors and send error status
@@ -163,50 +129,10 @@ app.get("/api/download", function (req, res) {
   // });
 });
 
-// async function createDir(count, sessID) {
-//   if (count == 0) {
-//     fs.mkdir(path.join(__dirname, sessID), (err) => {
-//       if (err) {
-//         return console.error(err);
-//       }
-//       console.log("Directory created successfully!");
-//     });
-//   }
-// }
+//*****************Functions area**********************/
+//Screenshot function
 
-async function saveScreenshot(url, sessID, index) {
-  // if (count == 0) {
-  //   fs.mkdir(path.join(__dirname, sessID), (err) => {
-  //     if (err) {
-  //       return console.error(err);
-  //     }
-  //     console.log("Directory created successfully!");
-  //   });
-  // }
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ["--no-sandbox"],
-  });
-  const page = await browser.newPage();
-  await page.goto(url, { waitUntil: "networkidle0", timeout: 0 });
-  // await page.setViewport({
-  //   width: 1400,
-  //   height: 1000,
-  //   deviceScaleFactor: 1,
-  // });
-  // await page.setViewport({ width: 1200, height: 1200 });
-  await page.screenshot({
-    fullPage: true,
-    path: sessID + "/" + index + ".png",
-  });
-  // const screenshot = await page.screenshot({ path: folder + '/' + count + '.png', fullPage: true })
-
-  await browser.close(
-    console.log("(" + index + ")" + "URL: " + url + " completed")
-  );
-  // return count
-}
-
+//Zip file function
 function zipFile(sessID) {
   let zip = require("node-zip")();
 
@@ -241,9 +167,121 @@ function zipFile(sessID) {
     // do something with the new zipped file
   });
 }
-
+//*****************Functions area**********************/
 // Starts the server to begin listening
 // =============================================================
 app.listen(PORT, function () {
   console.log("App listening on PORT " + PORT);
 });
+
+// const { url } = req.body;
+//  const { sessID } = req.body;
+//  const { count } = req.body;
+//  const { arrLength } = req.body;
+//  const { urlArray } = req.body;
+
+//  //console.log(urlArray);
+//  console.log("SessID: " + sessID);
+//  console.log("The amount of URLs: " + urlArray.length);
+//  console.log("URLs to be processed: " + urlArray);
+
+//  if (count == 0) {
+//    fs.mkdir(path.join(__dirname, sessID), (err) => {
+//      if (err) {
+//        return console.error("mkdir error: " + err);
+//      }
+//      console.log("Directory created successfully!");
+//    });
+//  }
+
+//  try {
+//console.log(urlArray);
+//  var testCount = 0;
+// for (var i = 0; i < 5; i++) {
+//   testCount++; //try to send counter from serverside to front
+// }
+
+//var count = 0;
+//  var promiseArray = [];
+//  var sequentialArray = [];
+//  var screenShotInstance = [];
+// let kickStart1 = await createDir(count, sessID);
+// for (var i = 0; i <= urlArray.length; ) {
+//   console.log("current url that being processed: " + urlArray[i]);
+//   screenShotInstance[i] = saveScreenshot(urlArray[i], sessID, count);
+//   //screenShotInstance[i] = urlArray[i]; <--testing
+//   promiseArray.push(screenShotInstance[i]);
+
+//   i++;
+//   count++;
+//   console.log("i: " + i + " count: " + count);
+//   console.log("ScreenShotInstance: " + screenShotInstance);
+//   console.log("gg result: " + JSON.stringify(promiseArray));
+// }
+
+//let screenshot = await saveScreenshot(url, sessID, count);
+
+///promise.all
+//await Promise.all(promiseArray.map(item => await saveScreenshot(urlArray[i], sessID, count)));
+// let kickStart2 =
+//  await Promise.all(
+//    urlArray.map(
+//      (url, index) => {
+//        saveScreenshot(url, sessID, index);
+//      },
+//      { concurrency: urlArray.length }
+//    )
+//  );
+//const dir = "./" + sessID;
+// fs.readdir(dir, (err, files) => {
+//   if (files.length == arrLength) {
+//     zipFile(sessID, function (err) {
+//       if (err) {
+//         console.log(err); // Check error if you want
+//       } else {
+//         return;
+//       }
+//     });
+//   }
+// });
+
+///
+// const list = [kickStart1, kickStart2];
+// for (const fn of list) {
+//   await fn();
+// }
+
+// let img = screenshot.toString('base64')
+
+//  async function saveScreenshot(url, sessID, index) {
+//   // if (count == 0) {
+//   //   fs.mkdir(path.join(__dirname, sessID), (err) => {
+//   //     if (err) {
+//   //       return console.error(err);
+//   //     }
+//   //     console.log("Directory created successfully!");
+//   //   });
+//   // }
+//   const browser = await puppeteer.launch({
+//     headless: true,
+//     args: ["--no-sandbox"],
+//   });
+//   const page = await browser.newPage();
+//   await page.goto(url, { waitUntil: "networkidle0", timeout: 0 });
+//   // await page.setViewport({
+//   //   width: 1400,
+//   //   height: 1000,
+//   //   deviceScaleFactor: 1,
+//   // });
+//   // await page.setViewport({ width: 1200, height: 1200 });
+//   await page.screenshot({
+//     fullPage: true,
+//     path: sessID + "/" + index + ".png",
+//   });
+//   // const screenshot = await page.screenshot({ path: folder + '/' + count + '.png', fullPage: true })
+
+//   await browser.close(
+//     console.log("(" + index + ")" + "URL: " + url + " completed")
+//   );
+//   // return count
+// }
