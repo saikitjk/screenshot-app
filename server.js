@@ -29,74 +29,66 @@ app.post("/api/savescreenshot", async (req, res) => {
   // const { url } = req.body;
   const { sessID } = req.body;
   const { count } = req.body;
-  //const { arrLength } = req.body;
-  var urlArray = req.body;
+  const { arrLength } = req.body;
+  //const urlArray = req.body;
+  var concurrenyValue = parseInt(arrLength);
+  //convert urlArray in req.body into an array
+  for (var urlArray in req.body) {
+    if (req.body.hasOwnProperty("urlArray")) {
+      var urlArrayToUse = req.body[urlArray];
+    }
+  }
 
-  //console.log(urlArray);
-  // console.log("SessID: " + sessID);
-  // console.log("The amount of URLs: " + urlArray.length);
+  // console.log(req.body);
+  //console.log(typeof concurrenyValue);
+  //console.log("urlArray " + urlArray);
+  // console.log("The amount of URLs: " + urlArrayToUse.length);
 
-  // if (count == 0) {
-  //   fs.mkdir(path.join(__dirname, sessID), (err) => {
-  //     if (err) {
-  //       return console.error("mkdir error: " + err);
-  //     }
-  //     console.log("Directory created successfully!");
-  //   });
-  // }
+  // ///url for test
+  // var urlArray = [
+  //   "https://www.google.com/",
+  //   "https://www.porsche.com/",
+  //   "https://www.bmw.com/",
+  // ];
 
   try {
-    // ///url for test
-    // var urlArray = [
-    //   "https://www.google.com/",
-    //   "https://www.porsche.com/",
-    //   "https://www.bmw.com/",
-    // ];
-
     (async () => {
-      //Create cluster with 10 workers
       const cluster = await Cluster.launch({
         //concurrency: Cluster.CONCURRENCY_CONTEXT,
         concurrency: Cluster.CONCURRENCY_BROWSER, //to prevent hang,
-        maxConcurrency: urlArray.length,
+        maxConcurrency: concurrenyValue,
+        //maxConcurrency: 15,
         workerCreationDelay: 200, //to prevent max cpu at the start
         monitor: true,
         headless: true,
         timeout: 300000,
       });
-
       // Print errors to console
       cluster.on("taskerror", (err, data) => {
         console.log(`Error crawling ${data}: ${err.message}`);
       });
-
       await cluster.task(async ({ page, data: url, worker }) => {
         // const browser = await puppeteer.launch({ headless: false, slowMo: 50 });
         // const page = await browser.newPage();
         console.log("sessID: " + sessID);
         console.log("Processing: " + worker.id + url);
-
         await page.goto(url, { waitUntil: "networkidle0", timeout: 0 });
         // const path = url.replace(/[^a-zA-Z]/g, "_") + ".png";
         //await page.setViewport({ width: 1024, height: 768 });
         //let frames = await page.frames();
-
         ///this saves at root
         // await page.screenshot({
         //   fullPage: true,
         //   path: `screenshot${worker.id}.png`,
         // });
-
         await page.screenshot({
           fullPage: true,
           path: `${sessID}/screenshot${worker.id}.png`,
         });
-
         console.log(`Screenshot of ${url} saved`);
       });
-
-      for (let i = 0; i < urlArray.length; i++) {
-        if (i == 0) {
+      for (let i = 0; i < urlArrayToUse.length; i++) {
+        if (i === 0) {
           fs.mkdir(path.join(__dirname, sessID), (err) => {
             if (err) {
               return console.error("mkdir error: " + err);
@@ -104,7 +96,7 @@ app.post("/api/savescreenshot", async (req, res) => {
             console.log("Directory created successfully!");
           });
         }
-        cluster.queue(urlArray[i]);
+        cluster.queue(urlArrayToUse[i]);
       }
       await cluster.idle();
       await cluster.close();
