@@ -70,8 +70,8 @@ app.post("/api/savescreenshot", async (req, res) => {
       await cluster.task(async ({ page, data: url, worker }) => {
         // const browser = await puppeteer.launch({ headless: false, slowMo: 50 });
         // const page = await browser.newPage();
-        console.log("sessID: " + sessID);
-        console.log("Processing: " + worker.id + url);
+        // console.log("sessID: " + sessID);
+        // console.log("Processing: " + worker.id + url);
         await page.goto(url, { waitUntil: "networkidle0", timeout: 0 });
         // const path = url.replace(/[^a-zA-Z]/g, "_") + ".png";
         //await page.setViewport({ width: 1024, height: 768 });
