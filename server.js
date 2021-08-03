@@ -28,7 +28,7 @@ app.get("/", function (req, res) {
 app.post("/api/savescreenshot", async (req, res) => {
   // const { url } = req.body;
   const { sessID } = req.body;
-  const { count } = req.body;
+  //const { count } = req.body;
   const { arrLength } = req.body;
   //const urlArray = req.body;
   var concurrenyValue = parseInt(arrLength);
@@ -56,12 +56,12 @@ app.post("/api/savescreenshot", async (req, res) => {
       const cluster = await Cluster.launch({
         //concurrency: Cluster.CONCURRENCY_CONTEXT,
         concurrency: Cluster.CONCURRENCY_BROWSER, //to prevent hang,
-        maxConcurrency: concurrenyValue,
-        //maxConcurrency: 15,
+        //maxConcurrency: concurrenyValue,
+        maxConcurrency: 10,
         workerCreationDelay: 200, //to prevent max cpu at the start
         monitor: true,
         headless: true,
-        timeout: 300000,
+        timeout: 600000,
       });
       // Print errors to console
       cluster.on("taskerror", (err, data) => {
@@ -83,7 +83,9 @@ app.post("/api/savescreenshot", async (req, res) => {
         // });
         await page.screenshot({
           fullPage: true,
-          path: `${sessID}/screenshot${worker.id}.png`,
+          //path: `${sessID}/screenshot${worker}.png`,
+
+          path: `${sessID}` + "/" + url.replace(/[^a-zA-Z]/g, "_") + ".png",
         });
         console.log(`Screenshot of ${url} saved`);
       });
