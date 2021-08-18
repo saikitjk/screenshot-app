@@ -39,10 +39,7 @@ app.post("/api/savescreenshot", async (req, res) => {
     }
   }
 
-  // console.log(req.body);
-  //console.log(typeof concurrenyValue);
-  //console.log("urlArray " + urlArray);
-  // console.log("The amount of URLs: " + urlArrayToUse.length);
+  console.log("The amount of URLs: " + urlArrayToUse.length);
 
   // ///url for test
   // var urlArray = [
@@ -68,19 +65,8 @@ app.post("/api/savescreenshot", async (req, res) => {
         console.log(`Error crawling ${data}: ${err.message}`);
       });
       await cluster.task(async ({ page, data: url, worker }) => {
-        // const browser = await puppeteer.launch({ headless: false, slowMo: 50 });
-        // const page = await browser.newPage();
-        // console.log("sessID: " + sessID);
-        // console.log("Processing: " + worker.id + url);
         await page.goto(url, { waitUntil: "networkidle0", timeout: 0 });
-        // const path = url.replace(/[^a-zA-Z]/g, "_") + ".png";
-        //await page.setViewport({ width: 1024, height: 768 });
-        //let frames = await page.frames();
-        ///this saves at root
-        // await page.screenshot({
-        //   fullPage: true,
-        //   path: `screenshot${worker.id}.png`,
-        // });
+
         await page.screenshot({
           fullPage: true,
           //path: `${sessID}/screenshot${worker}.png`,
@@ -102,21 +88,33 @@ app.post("/api/savescreenshot", async (req, res) => {
       }
       await cluster.idle();
       await cluster.close();
+
+      //****************************************** */
+      const dir = "./" + sessID;
+      var readyDL = false;
+      fs.readdir(dir, (err, files) => {
+        console.log("File size: " + files.length);
+        if (files.length == urlArrayToUse.length) {
+          zipFile(sessID, function (err) {
+            if (err) {
+              console.log(err); // Check error if you want
+            } else {
+              return;
+            }
+            readyDL = true;
+            console.log("Is ready to download: " + readyDL);
+          });
+          return res.status(200).json({ readyDL: readyDL });
+        }
+      });
+
+      //****************************************** */
+
       console.log("Completed, check the screenshots");
-      res.sendStatus(200);
+      //res.sendStatus(200);
+      //res.send({ readyDL: readyDL, status: 200 });
+      //res.status(200).json(readyDL);
     })();
-    //const dir = "./" + sessID;
-    // fs.readdir(dir, (err, files) => {
-    //   if (files.length == urlArray.length) {
-    //     zipFile(sessID, function (err) {
-    //       if (err) {
-    //         console.log(err); // Check error if you want
-    //       } else {
-    //         return;
-    //       }
-    //     });
-    //   }
-    // });
   } catch (e) {
     // catch errors and send error status
     console.log(e);
