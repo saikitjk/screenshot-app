@@ -158,11 +158,11 @@
 
         
 
-        function doNext() {
+        function doNext(count=0) {
           //var url = urlArray.shift()//this picks the first one from the array
           // var url = true
           console.log("url: " + url)
-          console.log("The count: " +count)
+          //console.log("The count: " +count)
           if (count <1) {
             // $.post("/api/savescreenshot", { arrLength: arrLength, url: url, sessID: sessID, count: count, urlArray:urlArray })
             $.post("/api/savescreenshot", { arrLength: arrLength,sessID:sessID,urlArray:urlArray })
@@ -195,7 +195,7 @@
               //   $("#save-btn").show()
               //   alert("Please check the URL(s) you've entered and make sure the requirements are met. \n\n Requirements: \n\n  1. Make sure URL is formatted correct (ex. https://www.google.com/ )\n 2. Only 1 URL per line in textbox")
               // });
-              //count++
+              count++
           }
         }
 

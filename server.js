@@ -101,9 +101,9 @@ app.post("/api/savescreenshot", async (req, res) => {
             } else {
               return;
             }
-            readyDL = true;
-            console.log("Is ready to download: " + readyDL);
           });
+          readyDL = true;
+          console.log("Is ready to download: " + readyDL);
           return res.status(200).json({ readyDL: readyDL });
         }
       });
@@ -146,12 +146,14 @@ app.get("/api/download", function (req, res) {
 function zipFile(sessID) {
   let zip = require("node-zip")();
 
-  let zipName = "screenshots.zip"; // This just creates a variable to store the name of the zip file that you want to create
+  let zipName = `${sessid}_screenshots.zip`; // This just creates a variable to store the name of the zip file that you want to create
   let someDir = fs.readdirSync(__dirname + "/" + sessID); // read the directory that you would like to zip
   let newZipFolder = zip.folder(sessID); // declare a folder with the same name as the directory you would like to zip (we'll later put the read contents into this folder)
 
   //append each file in the directory to the declared folder
+
   for (var i = 0; i < someDir.length; i++) {
+    console.log("inside zip file forloop");
     newZipFolder.file(
       someDir[i],
       fs.readFileSync(__dirname + "/" + sessID + "/" + someDir[i]),
@@ -162,7 +164,8 @@ function zipFile(sessID) {
   let data = zip.generate({ base64: false, compression: "DEFLATE" }); //generate the zip file data
 
   //write the data to file
-  fs.writeFile(__dirname + "/temp/" + zipName, data, "binary", function (err) {
+  fs.writeFile(__dirname + "/" + zipName, data, "binary", function (err) {
+    console.log("1. " + __dirname);
     if (err) {
       console.log(err);
     } else {
@@ -176,6 +179,7 @@ function zipFile(sessID) {
     }
     // do something with the new zipped file
   });
+  return;
 }
 //*****************Zip file functions area**********************/
 // Starts the server to begin listening
