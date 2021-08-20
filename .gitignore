@@ -117,3 +117,6 @@ dist
 
 #images
 *.png
+
+#zip
+*.zip

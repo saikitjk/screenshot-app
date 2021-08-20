@@ -145,15 +145,15 @@ app.get("/api/download", function (req, res) {
 
 function zipFile(sessID) {
   let zip = require("node-zip")();
-
-  let zipName = `${sessid}_screenshots.zip`; // This just creates a variable to store the name of the zip file that you want to create
+  //console.log("0.1 " + sessID);
+  let zipName = `${sessID}_screenshots.zip`; // This just creates a variable to store the name of the zip file that you want to create
   let someDir = fs.readdirSync(__dirname + "/" + sessID); // read the directory that you would like to zip
   let newZipFolder = zip.folder(sessID); // declare a folder with the same name as the directory you would like to zip (we'll later put the read contents into this folder)
 
   //append each file in the directory to the declared folder
 
   for (var i = 0; i < someDir.length; i++) {
-    console.log("inside zip file forloop");
+    //console.log("inside zip file forloop");
     newZipFolder.file(
       someDir[i],
       fs.readFileSync(__dirname + "/" + sessID + "/" + someDir[i]),
@@ -165,7 +165,7 @@ function zipFile(sessID) {
 
   //write the data to file
   fs.writeFile(__dirname + "/" + zipName, data, "binary", function (err) {
-    console.log("1. " + __dirname);
+    //console.log("1. " + __dirname);
     if (err) {
       console.log(err);
     } else {
