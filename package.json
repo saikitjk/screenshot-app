@@ -4,6 +4,7 @@
   "description": "",
   "main": "server.js",
   "dependencies": {
+    "circular-json": "^0.5.9",
     "express": "^4.16.3",
     "fs": "0.0.1-security",
     "install": "^0.13.0",

@@ -213,7 +213,8 @@
             },
 
             body: JSON.stringify({
-              data: result
+              data: result,
+              //sessID:sessID
             })
           })
             .then(resp => resp.blob())

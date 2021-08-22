@@ -5,6 +5,7 @@ const path = require("path");
 //const puppeteer = require("puppeteer");
 const { Cluster } = require("puppeteer-cluster");
 const fs = require("fs");
+//const CircularJSON = require("circular-json");
 // var Promise = require("bluebird");
 
 // Sets up the Express App
@@ -124,7 +125,11 @@ app.post("/api/savescreenshot", async (req, res) => {
 
 app.get("/api/download", function (req, res) {
   // var result = req.body.data
-  // console.log("result"+result)
+  // var sessID = req.body.sessID;
+  // console.log("res body " + req);
+  // console.log("sessssssid " + sessID);
+  // const file = __dirname + `/${sessID}screenshots.zip`;
+  // res.download(file, `${sessID}screenshots.zip`, function (err) {
   const file = __dirname + "/temp/screenshots.zip";
   res.download(file, "screenshots.zip", function (err) {
     if (err) {
@@ -146,7 +151,8 @@ app.get("/api/download", function (req, res) {
 function zipFile(sessID) {
   let zip = require("node-zip")();
   //console.log("0.1 " + sessID);
-  let zipName = `${sessID}_screenshots.zip`; // This just creates a variable to store the name of the zip file that you want to create
+  let zipName = "screenshots.zip";
+  // let zipName = `${sessID}_screenshots.zip`; // This just creates a variable to store the name of the zip file that you want to create
   let someDir = fs.readdirSync(__dirname + "/" + sessID); // read the directory that you would like to zip
   let newZipFolder = zip.folder(sessID); // declare a folder with the same name as the directory you would like to zip (we'll later put the read contents into this folder)
 
@@ -163,11 +169,15 @@ function zipFile(sessID) {
 
   let data = zip.generate({ base64: false, compression: "DEFLATE" }); //generate the zip file data
 
+  fs.promises
+    .mkdir(__dirname + "/temp/", { recursive: true })
+    .catch(console.error);
+
   //write the data to file
-  fs.writeFile(__dirname + "/" + zipName, data, "binary", function (err) {
+  fs.writeFile(__dirname + "/temp/" + zipName, data, "binary", function (err) {
     //console.log("1. " + __dirname);
     if (err) {
-      console.log(err);
+      console.log("triggered: " + err);
     } else {
       fs.rmdir(__dirname + "/" + sessID, { recursive: true }, (err) => {
         if (err) {
@@ -187,115 +197,3 @@ function zipFile(sessID) {
 app.listen(PORT, function () {
   console.log("App listening on PORT " + PORT);
 });
-
-// const { url } = req.body;
-//  const { sessID } = req.body;
-//  const { count } = req.body;
-//  const { arrLength } = req.body;
-//  const { urlArray } = req.body;
-
-//  //console.log(urlArray);
-//  console.log("SessID: " + sessID);
-//  console.log("The amount of URLs: " + urlArray.length);
-//  console.log("URLs to be processed: " + urlArray);
-
-//  if (count == 0) {
-//    fs.mkdir(path.join(__dirname, sessID), (err) => {
-//      if (err) {
-//        return console.error("mkdir error: " + err);
-//      }
-//      console.log("Directory created successfully!");
-//    });
-//  }
-
-//  try {
-//console.log(urlArray);
-//  var testCount = 0;
-// for (var i = 0; i < 5; i++) {
-//   testCount++; //try to send counter from serverside to front
-// }
-
-//var count = 0;
-//  var promiseArray = [];
-//  var sequentialArray = [];
-//  var screenShotInstance = [];
-// let kickStart1 = await createDir(count, sessID);
-// for (var i = 0; i <= urlArray.length; ) {
-//   console.log("current url that being processed: " + urlArray[i]);
-//   screenShotInstance[i] = saveScreenshot(urlArray[i], sessID, count);
-//   //screenShotInstance[i] = urlArray[i]; <--testing
-//   promiseArray.push(screenShotInstance[i]);
-
-//   i++;
-//   count++;
-//   console.log("i: " + i + " count: " + count);
-//   console.log("ScreenShotInstance: " + screenShotInstance);
-//   console.log("gg result: " + JSON.stringify(promiseArray));
-// }
-
-//let screenshot = await saveScreenshot(url, sessID, count);
-
-///promise.all
-//await Promise.all(promiseArray.map(item => await saveScreenshot(urlArray[i], sessID, count)));
-// let kickStart2 =
-//  await Promise.all(
-//    urlArray.map(
-//      (url, index) => {
-//        saveScreenshot(url, sessID, index);
-//      },
-//      { concurrency: urlArray.length }
-//    )
-//  );
-//const dir = "./" + sessID;
-// fs.readdir(dir, (err, files) => {
-//   if (files.length == arrLength) {
-//     zipFile(sessID, function (err) {
-//       if (err) {
-//         console.log(err); // Check error if you want
-//       } else {
-//         return;
-//       }
-//     });
-//   }
-// });
-
-///
-// const list = [kickStart1, kickStart2];
-// for (const fn of list) {
-//   await fn();
-// }
-
-// let img = screenshot.toString('base64')
-
-//  async function saveScreenshot(url, sessID, index) {
-//   // if (count == 0) {
-//   //   fs.mkdir(path.join(__dirname, sessID), (err) => {
-//   //     if (err) {
-//   //       return console.error(err);
-//   //     }
-//   //     console.log("Directory created successfully!");
-//   //   });
-//   // }
-//   const browser = await puppeteer.launch({
-//     headless: true,
-//     args: ["--no-sandbox"],
-//   });
-//   const page = await browser.newPage();
-//   await page.goto(url, { waitUntil: "networkidle0", timeout: 0 });
-//   // await page.setViewport({
-//   //   width: 1400,
-//   //   height: 1000,
-//   //   deviceScaleFactor: 1,
-//   // });
-//   // await page.setViewport({ width: 1200, height: 1200 });
-//   await page.screenshot({
-//     fullPage: true,
-//     path: sessID + "/" + index + ".png",
-//   });
-//   // const screenshot = await page.screenshot({ path: folder + '/' + count + '.png', fullPage: true })
-
-//   await browser.close(
-//     console.log("(" + index + ")" + "URL: " + url + " completed")
-//   );
-//   // return count
-// }
