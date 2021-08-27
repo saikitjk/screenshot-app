@@ -130,7 +130,7 @@ app.get("/api/download", function (req, res) {
   // console.log("sessssssid " + sessID);
   // const file = __dirname + `/${sessID}screenshots.zip`;
   // res.download(file, `${sessID}screenshots.zip`, function (err) {
-  const file = __dirname + "/temp/screenshots.zip";
+  const file = __dirname + "/temporary/screenshots.zip";
   res.download(file, "screenshots.zip", function (err) {
     if (err) {
       console.log(err); // Check error if you want
@@ -170,11 +170,13 @@ function zipFile(sessID) {
   let data = zip.generate({ base64: false, compression: "DEFLATE" }); //generate the zip file data
 
   fs.promises
-    .mkdir(__dirname + "/temp/", { recursive: true })
+    .mkdir(__dirname + "/temporary/", { recursive: true })
     .catch(console.error);
 
   //write the data to file
-  fs.writeFile(__dirname + "/temp/" + zipName, data, "binary", function (err) {
+  fs.writeFile(__dirname + "/temporary/" + zipName, data, "binary", function (
+    err
+  ) {
     //console.log("1. " + __dirname);
     if (err) {
       console.log("triggered: " + err);

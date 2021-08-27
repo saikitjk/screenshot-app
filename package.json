@@ -13,7 +13,9 @@
     "os": "^0.1.1",
     "puppeteer-cluster": "^0.22.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "react-scripts": "^4.0.3"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
