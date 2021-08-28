@@ -146,9 +146,15 @@
     
 // ];
         ////////testing//////////
-        console.log(urlArray )  
-      
 
+
+        if(urlArray == null){
+          $("#load-btn").hide()
+          $("#save-btn").show()
+          alert("No URL(s) detected. Please enter the URL(s) and make sure the requirements are met. \n\n Requirements: \n\n  1. Make sure URL is formatted correct (ex. https://www.google.com/ )\n 2. Only 1 URL per line in textbox")
+             
+        }
+      
        
         var arrLength = urlArray.length
         console.log("array length: " + urlArray.length)
