@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Screenshot App</title>
+  <!-- Latest compiled and minified CSS & JS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="https://code.jquery.com/jquery.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="jumbotron">
+      <h1>Screenshot App</h1>
+      <h3>Capture screenshot of any URL</h3>
+      <hr>
+    </div>
+    <div class="row">
+
+      <div class="col-12">
+
+        <div class="card">
+          <div class="card-header">
+            <h3><strong>Enter URL below</strong></h3>
+          </div>
+          <div class="card-body">
+            <form method="POST" role="form">
+
+              <div class="form-group">
+                <!-- <label for="URL">URL</label> -->
+                <textarea class="form-control" placeholder="ex. https://www.google.com/" id="url" rows="10"></textarea>
+              </div>
+
+            </form>
+            <br>
+            <div class="text-right">
+              <button type="submit" class="btn btn-primary btn-md" id="reset"><span class="fa fa-refresh"></span>
+                Reset</button>
+              <!-- <button type="submit" class="btn btn-primary btn-md" id="ss-btn"><span class="fa fa-camera"></span> Get
+                screenshot</button> -->
+              <button type="submit" class="btn btn-primary btn-md" id="save-btn"><span class="fa fa-camera"></span> Grab
+                screenshots</button>
+              <button class="btn btn-primary" type="button" id="load-btn" disabled>
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Processing. Please wait...
+              </button>
+
+              <a class="download" href="/api/download" target="_blank"><button type="submit"
+                  class="btn btn-primary btn-md" id="download"><span class="fa fa-camera"></span>Download
+                  File</button></a>
+
+            </div><br><br>
+            <div id='test'></div>
+          </div>
+        </div>
+
+      </div>
+    </div><br><br>
+
+    <div class="row">
+
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h3><strong>Instructions</strong></h3>
+          </div>
+          <div class="card-body">
+            <ol type="1">
+              <li>
+                <p>Enter the URLs as shown in the screenshot</p>
+                <p><small>IMPORTANT: URL must include <b>https</b> and end with a <b>forward slash (/)</b></small></p>
+                <img src="images/one.png" height="500">
+              </li>
+              <li>
+                <p>When all the URLs are ready, click "Grab Screenshots". You should see "Processing. Please wait..."
+                </p>
+                <p><small>If you encounter an error or issue with
+                    processing the screenshots, an alert will pop up on your browser. Double check the URLs to make sure
+                    they are in the correct format and/or
+                    reduce the number of URLs. (It will take a while to process the screenshots if there are too many
+                    URLs).</small>
+                </p>
+                <img src="images/two.png" height="500">
+              </li>
+              <li>
+                <p>When all the screenshots have been processed, you will see an alert on your browser window </p>
+              </li>
+              <img src="images/three.png">
+              <li>
+                <p>A new "Download file" button will appear. Click on it to download your zip file</p>
+              </li>
+              <img src="images/four.png" height="500">
+
+
+            </ol>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <script type="text/javascript">
+      $('#download').click(function (e) {
+        e.preventDefault();
+        window.open('/api/download', '_blank');
+        $("#download").hide()
+      });
+
+      $("#download").hide()
+      $("#load-btn").hide()
+      $("#ss-btn").show()
+
+      $('#reset').click(function () {
+        location.reload();
+      });
+
+      let ranGen = () => {
+        return Math.floor((1 + Math.random()) * 0x10000)
+          .toString(16)
+          .substring(1);
+      }
+
+      
+
+      $("#save-btn").on("click", function (event) {
+      
+        event.preventDefault();
+        $("#load-btn").show()
+        $("#save-btn").hide()
+         var url = $("#url").val().trim();
+         var urlArray = url.match(/[^\r\n]+/g); 
+        ////////testing///////////
+//         var urlArray = [
+//     "https://www.google.com/",
+//     "https://www.porsche.com/",
+//     "https://www.bmw.com/",
+//     "https://www.subaru.com/",
+//     "https://www.bmwseattle.com/",
+    
+// ];
+        ////////testing//////////
+        console.log(urlArray )  
+      
+
+       
+        var arrLength = urlArray.length
+        console.log("array length: " + urlArray.length)
+
+        var sessID = ranGen()
+        console.log(sessID)
+
+        
+
+        function doNext(count=0) {
+          //var url = urlArray.shift()//this picks the first one from the array
+          // var url = true
+          console.log("url: " + url)
+          //console.log("The count: " +count)
+          if (count <1) {
+            // $.post("/api/savescreenshot", { arrLength: arrLength, url: url, sessID: sessID, count: count, urlArray:urlArray })
+            $.post("/api/savescreenshot", { arrLength: arrLength,sessID:sessID,urlArray:urlArray })
+  
+              .then(res => {
+
+                console.log("res: " + res.readyDL)
+
+              
+
+
+
+                if (res.readyDL === true) {
+                  $("#load-btn").hide()
+                  $("#save-btn").show()
+                  $("#download").show()
+                  alert('your file is ready for download!')
+                }
+                else {
+                  
+                  doNext()
+                }
+              })
+              .fail(function (xhr, status, error) {
+                console.log("xhr" + json.stringify(xhr))
+                console.log("status" + status)
+                console.log("error" + error)
+                // error handling
+                $("#load-btn").hide()
+                $("#save-btn").show()
+                alert("Please check the URL(s) you've entered and make sure the requirements are met. \n\n Requirements: \n\n  1. Make sure URL is formatted correct (ex. https://www.google.com/ )\n 2. Only 1 URL per line in textbox")
+              });
+              count++
+          }
+        }
+
+        function downloadFile(result) {
+          // $.get('/api/download', { result: result })
+          // .then(res=>{
+          //   console.log("DONE")
+          // })
+          console.log("the result is " + result)
+          fetch('/api/download', {
+            method: "post",
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+
+            body: JSON.stringify({
+              data: result,
+              //sessID:sessID
+            })
+          })
+            .then(resp => resp.blob())
+            .then(blob => {
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.style.display = 'none';
+              a.href = url;
+              // the filename you want
+              a.download = 'screenshots.zip';
+              document.body.appendChild(a);
+              a.click();
+              window.URL.revokeObjectURL(url);
+              alert('your file is ready for download!'); // or you know, something with better UX...
+            })
+            .catch(() => alert('oh no! something went wrong. Please contact the page admin'));
+
+        }
+
+
+     
+        doNext() 
+
+      });
+    </script>
+
+</body>
+
+</html>
+
+<!--
+https://www.google.com/
+https://www.porsche.com/
+https://www.bmw.com/
+https://www.subaru.com/
+https://www.apple.com/
+https://www.amazon.com/
+https://www.facebook.com/
+https://www.wikipedia.org/
+https://www.instagram.com/
+https://www.microsoft.com/
+https://www.stackoverflow.com/
+https://www.yahoo.com/
+https://www.cnn.com/
+https://www.sony.com/
+https://www.bbc.co.uk/
+https://www.github.com/
+https://www.uw.org/
+https://www.hsbc.com/
+https://www.bankofamerica.com/
+https://fontawesome.com/
+https://www.hp.com/
+
+
+
+https://www.google.com/
+https://www.porsche.com/
+https://www.bmw.com/
+https://www.subaru.com/
+https://www.bmwseattle.com/
+https://www.bmwbellevue.com/
+https://www.mercedesbenzofbellevue.com/
+https://www.porschebellingham.com/
+https://www.porschebellevue.com/
+https://www.rentonsubaru.com/
+https://www.michaelssubaru.com/
+https://www.subaruofpuyallup.com/
+https://www.toyotaofrenton.com/
+https://www.toyotaofkirkland.com/
+https://www.rentonmazda.com/
+https://www.dougsmazda.com/
+https://www.toyotaoftacoma.com/
+https://www.porschebeaverton.com/
+https://www.bmwnorthwest.com/
+https://www.northwestmini.com/
+-->
+
+
+
