@@ -74,7 +74,7 @@
               <li>
                 <p>Enter the URLs as shown in the screenshot</p>
                 <p><small>IMPORTANT: URL must include <b>https</b> and end with a <b>forward slash (/)</b></small></p>
-                <img src="images/one.png" height="500">
+                <img src="/react-screenshot-app/images/one.png" height="500">
               </li>
               <li>
                 <p>When all the URLs are ready, click "Grab Screenshots". You should see "Processing. Please wait..."
@@ -85,16 +85,16 @@
                     reduce the number of URLs. (It will take a while to process the screenshots if there are too many
                     URLs).</small>
                 </p>
-                <img src="images/two.png" height="500">
+                <img src="/react-screenshot-app/images/images/two.png" height="500">
               </li>
               <li>
                 <p>When all the screenshots have been processed, you will see an alert on your browser window </p>
               </li>
-              <img src="images/three.png">
+              <img src="/react-screenshot-app/images/images/three.png">
               <li>
                 <p>A new "Download file" button will appear. Click on it to download your zip file</p>
               </li>
-              <img src="images/four.png" height="500">
+              <img src="/react-screenshot-app/images/images/four.png" height="500">
 
 
             </ol>
@@ -146,10 +146,13 @@
     
 // ];
         ////////testing//////////
-        console.log(urlArray )  
-      
+        if(urlArray == null){
+          $("#load-btn").hide()
+          $("#save-btn").show()
+          alert("No URL(s) detected. Please enter the URL(s) and make sure the requirements are met. \n\n Requirements: \n\n  1. Make sure URL is formatted correct (ex. https://www.google.com/ )\n 2. Only 1 URL per line in textbox")
 
-       
+        }
+      
         var arrLength = urlArray.length
         console.log("array length: " + urlArray.length)
 

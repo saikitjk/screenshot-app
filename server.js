@@ -32,7 +32,7 @@ app.post("/api/savescreenshot", async (req, res) => {
   //const { count } = req.body;
   const { arrLength } = req.body;
   //const urlArray = req.body;
-  var concurrenyValue = parseInt(arrLength);
+  var concurrenyValue = parseInt(arrLength); //this is for dynamic concurrency value
   //convert urlArray in req.body into an array
   for (var urlArray in req.body) {
     if (req.body.hasOwnProperty("urlArray")) {
@@ -54,7 +54,7 @@ app.post("/api/savescreenshot", async (req, res) => {
       const cluster = await Cluster.launch({
         //concurrency: Cluster.CONCURRENCY_CONTEXT,
         concurrency: Cluster.CONCURRENCY_BROWSER, //to prevent hang,
-        //maxConcurrency: concurrenyValue,
+        //maxConcurrency: concurrenyValue, //this is for dynamic concurrency value
         maxConcurrency: 10,
         workerCreationDelay: 200, //to prevent max cpu at the start
         monitor: true,
