@@ -1,18 +1,26 @@
 import Header from "./components/header/header";
 import Main from "./components/main/main";
-import ControlPanel from "./components/controlPanel/controlPanel";
 import Instruction from "./components/instruction/instruction";
+import { Row, Container, Col } from "reactstrap";
+
 import "./App.css";
 
 function App() {
   return (
     <div className="App">
-      <div className="container">
+      <Container>
         <Header />
-        <Main />
-        <ControlPanel />
-        <Instruction />
-      </div>
+        <Row>
+          <Col>
+            <Main />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Instruction />
+          </Col>
+        </Row>
+      </Container>
     </div>
   );
 }
