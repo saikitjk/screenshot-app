@@ -1,5 +1,6 @@
 import React from "react";
 import { FormGroup, Input, Button } from "reactstrap";
+import { FaSyncAlt } from "react-icons/fa";
 import "./searchBox.css";
 
 export default function searchBox() {
@@ -14,7 +15,12 @@ export default function searchBox() {
         />
       </FormGroup>
 
-      <div class="text-right">
+      <div className="text-right">
+        <Button className="btn btn-primary btn-md" type="submit" id="reset">
+          <FaSyncAlt />
+          Reset
+        </Button>
+
         <button type="submit" class="btn btn-primary btn-md" id="reset">
           <span class="fa fa-refresh"></span>
           Reset

@@ -2,7 +2,6 @@ import Header from "./components/header/header";
 import Main from "./components/main/main";
 import Instruction from "./components/instruction/instruction";
 import { Row, Container, Col } from "reactstrap";
-
 import "./App.css";
 
 function App() {

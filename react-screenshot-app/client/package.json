@@ -15,6 +15,7 @@
     "puppeteer-cluster": "^0.22.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-icons": "^4.2.0",
     "react-scripts": "4.0.3",
     "reactstrap": "^8.10.0",
     "web-vitals": "^1.1.2"
