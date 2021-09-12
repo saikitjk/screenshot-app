@@ -3,11 +3,14 @@ import { FormGroup, Input, Button } from "reactstrap";
 import { FaSyncAlt, FaCameraRetro, FaDownload } from "react-icons/fa";
 import "./searchBox.css";
 
-export default function searchBox() {
+export default function searchBox(props) {
+  // console.log(props);
   return (
     <div>
       <FormGroup>
         <Input
+          onChange={props.handleInputChange}
+          value={props.inputValue}
           type="textarea"
           name="text"
           id="exampleText"
@@ -16,12 +19,24 @@ export default function searchBox() {
       </FormGroup>
 
       <div className="text-right">
-        <Button color="primary" className="resetBtn" type="submit" id="reset">
+        <Button
+          onClick={props.handleReset}
+          color="primary"
+          className="resetBtn"
+          type="submit"
+          id="reset"
+        >
           <FaSyncAlt />
           Reset
         </Button>
 
-        <Button color="primary" className="saveBtn" type="submit" id="save-btn">
+        <Button
+          onClick={props.handleGrab}
+          color="primary"
+          className="saveBtn"
+          type="submit"
+          id="save-btn"
+        >
           <FaCameraRetro />
           Grab screenshots
         </Button>
@@ -36,7 +51,13 @@ export default function searchBox() {
           Processing. Please wait...
         </Button>
 
-        <Button color="primary" className="dlBtn" type="submit" id="download">
+        <Button
+          onClick={props.handleDL}
+          color="primary"
+          className="dlBtn"
+          type="submit"
+          id="download"
+        >
           <FaDownload />
           Download File
         </Button>
