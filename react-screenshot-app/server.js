@@ -9,7 +9,7 @@ const fs = require("fs");
 // Sets up the Express App
 // =============================================================
 var app = express();
-var PORT = 5000;
+var PORT = process.env.PORT || 3001;
 
 // Sets up the Express app to handle data parsing
 app.use(express.urlencoded({ extended: true }));
@@ -21,8 +21,12 @@ app.use(express.static(__dirname + "/src"));
 
 // Basic route that sends the user first to the AJAX Page
 app.get("/", function (req, res) {
-  res.sendFile(path.join(__dirname, "index.html"));
+  res.sendFile(path.join(__dirname, "./client/public/index.html"));
 });
+
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "./client/build/index.html"));
+// });
 
 app.post("/api/savescreenshot", async (req, res) => {
   // const { url } = req.body;
@@ -37,8 +41,9 @@ app.post("/api/savescreenshot", async (req, res) => {
       var urlArrayToUse = req.body[urlArray];
     }
   }
-
-  console.log("The amount of URLs: " + urlArrayToUse.length);
+  console.log("what is req.body: " + JSON.stringify(req.body));
+  console.log("urlArrayToUser: " + urlArrayToUse);
+  //console.log("The amount of URLs: " + urlArrayToUse.length);
 
   // ///url for test
   // var urlArray = [
