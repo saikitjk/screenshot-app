@@ -59,8 +59,9 @@ class Main extends React.Component {
             },
           })
           .then((res) => {
-            console.log("res: " + res.readyDL);
-            if (res.readyDL === true) {
+            console.log("what is response: " + JSON.stringify(res));
+            console.log("res: " + res.data);
+            if (res.data === true) {
               // $("#load-btn").hide()
               // $("#save-btn").show()
               // $("#download").show()

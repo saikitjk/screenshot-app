@@ -43,8 +43,8 @@ app.post("/api/savescreenshot", async (req, res) => {
       var urlArrayToUse = req.body[urlArray];
     }
   }
-  console.log("what is req.body: " + JSON.stringify(req.body));
-  console.log("urlArrayToUser: " + urlArrayToUse);
+  // console.log("what is req.body: " + JSON.stringify(req.body));
+  // console.log("urlArrayToUser: " + urlArrayToUse);
   //console.log("The amount of URLs: " + urlArrayToUse.length);
 
   // ///url for test
@@ -107,7 +107,7 @@ app.post("/api/savescreenshot", async (req, res) => {
           });
           readyDL = true;
           console.log("Is ready to download: " + readyDL);
-          return res.status(200).json({ readyDL: readyDL });
+          return res.status(200).json(readyDL);
         }
       });
       //****************************************** */
@@ -186,7 +186,9 @@ function zipFile(sessID) {
           throw err;
         }
 
-        console.log(`${someDir} is deleted!`);
+        console.log(
+          "Screenshots are zipped and the original image files are deleted!"
+        );
       });
     }
     // do something with the new zipped file

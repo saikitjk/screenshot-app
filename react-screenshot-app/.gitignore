@@ -121,4 +121,9 @@ dist
 #zip
 *.zip
 
+#temp folder
+temporary
+react-screenshot-app/temporary
+
+
 .DS_Store
