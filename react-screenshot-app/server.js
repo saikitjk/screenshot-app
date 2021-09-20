@@ -10,11 +10,13 @@ const fs = require("fs");
 // =============================================================
 var app = express();
 var PORT = process.env.PORT || 3001;
+var cors = require("cors");
 
 // Sets up the Express app to handle data parsing
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(__dirname + "/src"));
+app.use(cors());
 
 // Routes
 // =============================================================
@@ -70,11 +72,9 @@ app.post("/api/savescreenshot", async (req, res) => {
       });
       await cluster.task(async ({ page, data: url, worker }) => {
         await page.goto(url, { waitUntil: "networkidle0", timeout: 0 });
-
         await page.screenshot({
           fullPage: true,
           //path: `${sessID}/screenshot${worker}.png`,
-
           path: `${sessID}` + "/" + url.replace(/[^a-zA-Z]/g, "_") + ".png",
         });
         console.log(`Screenshot of ${url} saved`);
@@ -92,7 +92,6 @@ app.post("/api/savescreenshot", async (req, res) => {
       }
       await cluster.idle();
       await cluster.close();
-
       //****************************************** */
       const dir = "./" + sessID;
       var readyDL = false;
@@ -111,9 +110,7 @@ app.post("/api/savescreenshot", async (req, res) => {
           return res.status(200).json({ readyDL: readyDL });
         }
       });
-
       //****************************************** */
-
       console.log("Completed, check the screenshots");
       //res.sendStatus(200);
       //res.send({ readyDL: readyDL, status: 200 });

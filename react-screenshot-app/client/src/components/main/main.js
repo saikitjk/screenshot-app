@@ -51,7 +51,7 @@ class Main extends React.Component {
           .request({
             method: "POST",
             url: "http://localhost:3001/api/savescreenshot",
-            header: { "Content-Type": "application/json" },
+            header: { "Content-Type": "x-www-form-urlencoded" },
             data: {
               arrLength: arrLength,
               sessID: sessID,
@@ -69,18 +69,18 @@ class Main extends React.Component {
               console.log("something wrong");
               //doNext();
             }
-          })
-          .fail(function (xhr, status, error) {
-            console.log("xhr" + JSON.stringify(xhr));
-            console.log("status" + status);
-            console.log("error" + error);
-            // error handling
-            //   $("#load-btn").hide()
-            //   $("#save-btn").show()
-            alert(
-              "Please check the URL(s) you've entered and make sure the requirements are met. \n\n Requirements: \n\n  1. Make sure URL is formatted correct (ex. https://www.google.com/ )\n 2. Only 1 URL per line in textbox"
-            );
           });
+        //   .fail(function (xhr, status, error) {
+        //     console.log("xhr" + JSON.stringify(xhr));
+        //     console.log("status" + status);
+        //     console.log("error" + error);
+        //     // error handling
+        //     //   $("#load-btn").hide()
+        //     //   $("#save-btn").show()
+        //     alert(
+        //       "Please check the URL(s) you've entered and make sure the requirements are met. \n\n Requirements: \n\n  1. Make sure URL is formatted correct (ex. https://www.google.com/ )\n 2. Only 1 URL per line in textbox"
+        //     );
+        //   });
         count++;
       }
     }
