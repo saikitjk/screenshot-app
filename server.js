@@ -110,15 +110,10 @@ app.post("/api/savescreenshot", async (req, res) => {
       });
 
       //****************************************** */
-
-      console.log("Completed, check the screenshots");
-      //res.sendStatus(200);
-      //res.send({ readyDL: readyDL, status: 200 });
-      //res.status(200).json(readyDL);
     })();
   } catch (e) {
     // catch errors and send error status
-    console.log(e);
+    console.log("err: " + e);
     res.sendStatus(500);
   }
 });

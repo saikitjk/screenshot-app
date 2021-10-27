@@ -26,16 +26,9 @@ app.get("/", function (req, res) {
   res.sendFile(path.join(__dirname, "./client/public/index.html"));
 });
 
-// app.get("*", (req, res) => {
-//   res.sendFile(path.join(__dirname, "./client/build/index.html"));
-// });
-
 app.post("/api/savescreenshot", async (req, res) => {
-  // const { url } = req.body;
-  const { sessID } = req.body;
-  //const { count } = req.body;
-  const { arrLength } = req.body;
-  //const urlArray = req.body;
+  const { sessID } = req.body; //object destructuring
+  const { arrLength } = req.body; //object destructuring
   var concurrenyValue = parseInt(arrLength); //this is for dynamic concurrency value
   //convert urlArray in req.body into an array
   for (var urlArray in req.body) {
@@ -90,36 +83,54 @@ app.post("/api/savescreenshot", async (req, res) => {
         }
         cluster.queue(urlArrayToUse[i]);
       }
+      console.log("Queue is empty");
       await cluster.idle();
       await cluster.close();
       //****************************************** */
       const dir = "./" + sessID;
-      var readyDL = false;
       fs.readdir(dir, (err, files) => {
         console.log("File size: " + files.length);
-        if (files.length == urlArrayToUse.length) {
+        if (files.length === 0) {
+          console.log("No file to zip");
+          return res.json({
+            err: err,
+            readyDl: false,
+            msg:
+              "No file to zip. Please check URL input or contact the page admin.",
+          });
+        }
+        // if (files.length == urlArrayToUse.length) {
+        if (files.length > 0) {
           zipFile(sessID, function (err) {
             if (err) {
               console.log(err); // Check error if you want
+              return res.json({
+                err: err,
+                readyDl: false,
+                msg:
+                  "Internal server error. Please contact the page administrator.",
+              });
             } else {
               return;
             }
           });
-          readyDL = true;
-          console.log("Is ready to download: " + readyDL);
-          return res.status(200).json(readyDL);
+          return res.status(200).json({
+            readyDl: true,
+            msg: "Your file is ready for download!",
+            fileSize: files.length,
+          });
         }
       });
       //****************************************** */
-      console.log("Completed, check the screenshots");
-      //res.sendStatus(200);
-      //res.send({ readyDL: readyDL, status: 200 });
-      //res.status(200).json(readyDL);
     })();
   } catch (e) {
     // catch errors and send error status
-    console.log(e);
-    res.sendStatus(500);
+    console.log("e" + e);
+    res.sendStatus(500).json({
+      err: err,
+      readyDl: false,
+      msg: "Internal server error. Please contact the page administrator.",
+    });
   }
 });
 
